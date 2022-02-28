@@ -17,6 +17,7 @@ pub fn draw(game: &Game) {
         draw_car(car);
     }
     print!("\x1b[10;10H\n"); // move cursor to bottom
+    print!("\x1b[0m\n"); // reset
 }
 
 fn draw_car(car: &Car) {
@@ -24,14 +25,20 @@ fn draw_car(car: &Car) {
     print!("\x1b[{};{}H", x, y); // move cursor
 
     let color = Color::from_game(car.color);
+    print!("\x1b[48;5;{}m\x1b[38;5;{}m", color.fg, color.bg); // set color
 
     if car.vertical {
-        println!(
-            "\x1b[48;5;{}m\x1b[38;5;{}m^\x1b[1B\x1b[1D|\x1b[1B\x1b[0m",
-            color.fg, color.bg
-        );
+        print!("^");
+        print!("\x1b[1B\x1b[1D|"); // add | bellow
+        if car.size == 3 {
+            print!("\x1b[1B\x1b[1D|"); // add | bellow
+        }
     } else {
-        print!("\x1b[48;5;{}m\x1b[38;5;{}m-->\x1b[0m", color.fg, color.bg);
+        if car.size == 3 {
+            print!("- - >");
+        } else {
+            print!("- >");
+        }
     }
 }
 

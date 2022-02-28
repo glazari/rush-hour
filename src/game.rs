@@ -9,10 +9,10 @@ impl Game {
                 Car::new(Color::Bege, false, (0, 0)),
                 Car::new(Color::Brown, true, (1, 0)),
                 Car::new(Color::PukeGreen, true, (1, 1)),
-                Car::new(Color::Blue, true, (0, 2)),
-                Car::new(Color::LightPurple, true, (0, 3)),
-                Car::new(Color::BlueGreen, true, (0, 4)),
-                Car::new(Color::Yellow, true, (0, 5)),
+                Car::new_truck(Color::Blue, true, (0, 2)),
+                Car::new_truck(Color::LightPurple, true, (0, 3)),
+                Car::new_truck(Color::BlueGreen, true, (0, 4)),
+                Car::new_truck(Color::Yellow, true, (0, 5)),
                 Car::new(Color::LightYellow, true, (3, 0)),
                 Car::new(Color::Green, true, (3, 1)),
                 Car::new(Color::Grey, true, (3, 2)),
@@ -29,6 +29,7 @@ impl Game {
 
 pub struct Car {
     pub color: Color,
+    pub size: u8,
     pub vertical: bool,
     pub position: (u8, u8),
 }
@@ -37,6 +38,15 @@ impl Car {
     pub fn new(color: Color, vertical: bool, position: (u8, u8)) -> Car {
         Car {
             color,
+            size: 2,
+            vertical,
+            position,
+        }
+    }
+    pub fn new_truck(color: Color, vertical: bool, position: (u8, u8)) -> Car {
+        Car {
+            color,
+            size: 3,
             vertical,
             position,
         }
