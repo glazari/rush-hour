@@ -1,27 +1,31 @@
 use crate::game::{self, Car, Game};
 
-pub fn draw(game: &Game) {
+pub fn clear() {
     print!("\x1b[2J"); // clear screen
-    print!("\x1b[0;0H"); // move cursor to top
+}
 
-    println!(" _____________ ");
-    println!("| o o o o o o |");
-    println!("| o o o o o o |");
-    println!("| o o o o o o  ");
-    println!("| o o o o o o |");
-    println!("| o o o o o o |");
-    println!("| o o o o o o |");
-    println!(" _____________ ");
+pub fn draw(base: (u8, u8), game: &Game) {
+    print!("\x1b[{};{}H", base.0, base.1); // move cursor to top
+
+    print!(" _____________ \x1b[1B\x1b[15D");
+    print!("| o o o o o o |\x1b[1B\x1b[15D");
+    print!("| o o o o o o |\x1b[1B\x1b[15D");
+    print!("| o o o o o o  \x1b[1B\x1b[15D");
+    print!("| o o o o o o |\x1b[1B\x1b[15D");
+    print!("| o o o o o o |\x1b[1B\x1b[15D");
+    print!("| o o o o o o |\x1b[1B\x1b[15D");
+    print!(" _____________ \x1b[1B\x1b[15D");
 
     for car in game.cars.iter() {
-        draw_car(car);
+        draw_car(base, car);
     }
-    print!("\x1b[10;10H\n"); // move cursor to bottom
+    print!("\x1b[{};{}H\n", base.0 + 7, base.1 + 15); // move cursor to bottom
     print!("\x1b[0m\n"); // reset
 }
 
-fn draw_car(car: &Car) {
-    let (x, y) = (car.position.0 + 2, (car.position.1 * 2) + 3);
+fn draw_car(base: (u8, u8), car: &Car) {
+    let x = base.0 + car.position.0 + 1;
+    let y = base.1 + (car.position.1 * 2) + 2;
     print!("\x1b[{};{}H", x, y); // move cursor
 
     let color = Color::from_game(car.color);
