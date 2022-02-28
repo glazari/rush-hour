@@ -10,20 +10,10 @@ fn main() {
     println!(" _________ ");
 
     // draw horizontal car
-    let car = Car {
-        color: 1,
-        background: 196,
-        vertical: false,
-        position: (0, 0),
-    };
+    let car = Car::new(1, 196, false, (0, 0));
     car.draw();
 
-    let car = Car {
-        color: 22,
-        background: 64,
-        vertical: true,
-        position: (2, 1),
-    };
+    let car = Car::new(22, 64, true, (2, 1));
     car.draw();
 
     print!("\x1b[10;10H\n"); // move cursor to bottom
@@ -37,6 +27,14 @@ struct Car {
 }
 
 impl Car {
+    fn new(color: u8, background: u8, vertical: bool, position: (u8, u8)) -> Car {
+        Car {
+            color,
+            background,
+            vertical,
+            position,
+        }
+    }
     fn draw(&self) {
         let (x, y) = (self.position.0 + 2, (self.position.1 * 2) + 3);
         print!("\x1b[{};{}H", x, y); // move cursor
