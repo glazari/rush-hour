@@ -78,4 +78,13 @@ impl Color {
  *
  * CLEAR SCREEN:    \x1b[2J
  * SET POSITION:    \x1b[{row};{column}H
+ *
+ *
+ * Print all colors to explore
+ *
+ *   for i in 0..256 {
+ *       print!("\x1b[48;5;{}m {} ", i, i);
+ *       print!("\x1b[0m ");
+ *   }
+ *   println!("\x1b[0m");
  */
