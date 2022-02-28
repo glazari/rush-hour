@@ -1,4 +1,4 @@
-use crate::game::{Car, Game};
+use crate::game::{self, Car, Game};
 
 pub fn draw(game: &Game) {
     print!("\x1b[2J"); // clear screen
@@ -21,16 +21,33 @@ fn draw_car(car: &Car) {
     let (x, y) = (car.position.0 + 2, (car.position.1 * 2) + 3);
     print!("\x1b[{};{}H", x, y); // move cursor
 
+    let color = Color::from_game(car.color);
+
     if car.vertical {
         println!(
             "\x1b[48;5;{}m\x1b[38;5;{}m^\x1b[1B\x1b[1D|\x1b[1B\x1b[0m",
-            car.color, car.background
+            color.fg, color.bg
         );
     } else {
-        print!(
-            "\x1b[48;5;{}m\x1b[38;5;{}m-->\x1b[0m",
-            car.color, car.background
-        );
+        print!("\x1b[48;5;{}m\x1b[38;5;{}m-->\x1b[0m", color.fg, color.bg);
+    }
+}
+
+struct Color {
+    fg: u8, // forground
+    bg: u8, // background
+}
+
+impl Color {
+    fn new(fg: u8, bg: u8) -> Color {
+        Color { fg, bg }
+    }
+
+    fn from_game(c: game::Color) -> Color {
+        match c {
+            game::Color::Red => Color::new(1, 196),
+            game::Color::Green => Color::new(22, 64),
+        }
     }
 }
 
