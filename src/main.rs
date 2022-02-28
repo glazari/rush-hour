@@ -6,4 +6,7 @@ mod tui;
 fn main() {
     let game = game::Game::full_grid();
     tui::draw(&game);
+
+    let game = game::Game::example_game();
+    tui::draw(&game);
 }

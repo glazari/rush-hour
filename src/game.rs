@@ -25,6 +25,21 @@ impl Game {
             ],
         }
     }
+
+    pub fn example_game() -> Game {
+        Game {
+            cars: vec![
+                Car::new_truck(Color::LightPurple, true, (0, 0)),
+                Car::new(Color::PukeGreen, false, (0, 1)),
+                Car::new(Color::RedMain, false, (2, 1)),
+                Car::new(Color::Orange, true, (4, 0)),
+                Car::new(Color::Cyan, false, (4, 1)),
+                Car::new_truck(Color::BlueGreen, false, (5, 2)),
+                Car::new_truck(Color::Blue, true, (1, 3)),
+                Car::new_truck(Color::Yellow, true, (3, 5)),
+            ],
+        }
+    }
 }
 
 pub struct Car {
