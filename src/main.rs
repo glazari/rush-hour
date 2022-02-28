@@ -10,14 +10,49 @@ fn main() {
     println!(" _________ ");
 
     // draw horizontal car
-    print!("\x1b[2;3H"); // move cursor
-    print!("\x1b[48;5;1m\x1b[38;5;196m-->\x1b[0m");
+    let car = Car {
+        color: 1,
+        background: 196,
+        vertical: false,
+        position: (0, 0),
+    };
+    car.draw();
 
-    // draw vertical car
-    print!("\x1b[4;5H"); // move cursor
-    println!("\x1b[48;5;1m\x1b[38;5;196m^\x1b[1B\x1b[1D|\x1b[1B\x1b[0m");
+    let car = Car {
+        color: 22,
+        background: 64,
+        vertical: true,
+        position: (2, 1),
+    };
+    car.draw();
 
     print!("\x1b[10;10H\n"); // move cursor to bottom
+}
+
+struct Car {
+    color: u8,
+    background: u8,
+    vertical: bool,
+    position: (u8, u8),
+}
+
+impl Car {
+    fn draw(&self) {
+        let (x, y) = (self.position.0 + 2, (self.position.1 * 2) + 3);
+        print!("\x1b[{};{}H", x, y); // move cursor
+
+        if self.vertical {
+            println!(
+                "\x1b[48;5;{}m\x1b[38;5;{}m^\x1b[1B\x1b[1D|\x1b[1B\x1b[0m",
+                self.color, self.background
+            );
+        } else {
+            print!(
+                "\x1b[48;5;{}m\x1b[38;5;{}m-->\x1b[0m",
+                self.color, self.background
+            );
+        }
+    }
 }
 
 /*
