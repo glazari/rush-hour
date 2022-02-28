@@ -4,12 +4,14 @@ pub fn draw(game: &Game) {
     print!("\x1b[2J"); // clear screen
     print!("\x1b[0;0H"); // move cursor to top
 
-    println!(" _________ ");
-    println!("| o o o o |");
-    println!("| o o o o  ");
-    println!("| o o o o |");
-    println!("| o o o o |");
-    println!(" _________ ");
+    println!(" _____________ ");
+    println!("| o o o o o o |");
+    println!("| o o o o o o |");
+    println!("| o o o o o o  ");
+    println!("| o o o o o o |");
+    println!("| o o o o o o |");
+    println!("| o o o o o o |");
+    println!(" _____________ ");
 
     for car in game.cars.iter() {
         draw_car(car);
@@ -45,8 +47,22 @@ impl Color {
 
     fn from_game(c: game::Color) -> Color {
         match c {
-            game::Color::Red => Color::new(1, 196),
+            game::Color::RedMain => Color::new(1, 196),
             game::Color::Green => Color::new(22, 64),
+            game::Color::PukeGreen => Color::new(64, 22),
+            game::Color::Pink => Color::new(211, 163),
+            game::Color::Purple => Color::new(55, 99),
+            game::Color::LightPurple => Color::new(141, 93),
+            game::Color::Grey => Color::new(241, 232),
+            game::Color::Yellow => Color::new(11, 220),
+            game::Color::LightYellow => Color::new(228, 214),
+            game::Color::Blue => Color::new(12, 27),
+            game::Color::SeaBlue => Color::new(24, 17),
+            game::Color::BlueGreen => Color::new(31, 22),
+            game::Color::Cyan => Color::new(49, 37),
+            game::Color::Brown => Color::new(130, 214),
+            game::Color::Orange => Color::new(202, 208),
+            game::Color::Bege => Color::new(137, 94),
         }
     }
 }
