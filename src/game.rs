@@ -1,3 +1,5 @@
+use std::collections::HashSet;
+
 pub struct Game {
     pub cars: Vec<Car>,
 }
@@ -5,6 +7,49 @@ pub struct Game {
 const V: Dir = Dir::V;
 const H: Dir = Dir::H;
 
+impl Game {
+    fn invalid(&self) -> Option<Error> {
+        // check duplicates
+        let mut set: HashSet<Piece> = HashSet::new();
+        for car in self.cars.iter() {
+            if set.contains(&car.piece) {
+                return Some(Error::DuplicatePiece);
+            }
+            set.insert(car.piece);
+        }
+
+        // check out of bounds
+        for car in self.cars.iter() {
+            if Game::car_out_of_bound(car) {
+                return Some(Error::OutOfBounds);
+            }
+        }
+
+        None
+    }
+
+    fn car_out_of_bound(car: &Car) -> bool {
+        if car.position.0 > 5 || car.position.1 > 5 {
+            return true;
+        }
+
+        match car.dir {
+            Dir::H => {
+                if car.position.1 + car.size() > 5 {
+                    return true;
+                }
+            }
+            Dir::V => {
+                if car.position.0 + car.size() > 5 {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+}
+
+// example games
 impl Game {
     pub fn full_grid() -> Game {
         Game {
@@ -51,7 +96,7 @@ pub enum Dir {
     H, //horizontal
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq, Hash, Clone, Copy)]
 pub enum Piece {
     Bege,
     Brown,
@@ -137,4 +182,61 @@ pub enum Color {
     Brown,
     Orange,
     Bege,
+}
+
+#[derive(Debug, PartialEq)]
+enum Error {
+    DuplicatePiece,
+    OutOfBounds,
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[test]
+    fn game_valid() {
+        let game = Game {
+            cars: vec![Car::new(H, (0, 0), Piece::Bege)],
+        };
+
+        assert_eq!(game.invalid(), None);
+    }
+
+    #[test]
+    fn game_invalid_duplicate_piece() {
+        let game = Game {
+            cars: vec![
+                Car::new(H, (0, 0), Piece::Bege),
+                Car::new(H, (0, 0), Piece::Bege),
+            ],
+        };
+
+        assert_eq!(game.invalid().unwrap(), Error::DuplicatePiece);
+    }
+
+    #[test]
+    fn game_invalid_out_of_bounds() {
+        // invalid cars
+        let invalid_cars = vec![
+            Car::new(H, (6, 0), Piece::Bege),      // row index oob
+            Car::new(H, (0, 6), Piece::Bege),      // col index oob
+            Car::new(V, (5, 0), Piece::Bege),      // row + size oob
+            Car::new(V, (4, 0), Piece::BlueTruck), // row + size oob
+            Car::new(H, (0, 5), Piece::Bege),      // row + size oob
+            Car::new(H, (0, 4), Piece::BlueTruck), // row + size oob
+        ];
+
+        for car in invalid_cars.iter() {
+            println!("{:?}", car);
+            assert!(Game::car_out_of_bound(car))
+        }
+
+        // invalid game
+        let game = Game {
+            cars: vec![Car::new(H, (6, 0), Piece::Bege)],
+        };
+
+        assert_eq!(game.invalid().unwrap(), Error::OutOfBounds);
+    }
 }
