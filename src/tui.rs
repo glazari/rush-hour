@@ -1,4 +1,4 @@
-use crate::game::{self, Car, Game};
+use crate::game::{self, Car, Dir, Game};
 
 pub fn clear() {
     print!("\x1b[2J"); // clear screen
@@ -28,20 +28,23 @@ fn draw_car(base: (u8, u8), car: &Car) {
     let y = base.1 + (car.position.1 * 2) + 2;
     print!("\x1b[{};{}H", x, y); // move cursor
 
-    let color = Color::from_game(car.color);
+    let color = Color::from_game(car.color());
     print!("\x1b[48;5;{}m\x1b[38;5;{}m", color.fg, color.bg); // set color
 
-    if car.vertical {
-        print!("^");
-        print!("\x1b[1B\x1b[1D|"); // add | bellow
-        if car.size == 3 {
+    match car.dir {
+        Dir::V => {
+            print!("^");
             print!("\x1b[1B\x1b[1D|"); // add | bellow
+            if car.size() == 3 {
+                print!("\x1b[1B\x1b[1D|"); // add | bellow
+            }
         }
-    } else {
-        if car.size == 3 {
-            print!("- - >");
-        } else {
-            print!("- >");
+        Dir::H => {
+            if car.size() == 3 {
+                print!("- - >");
+            } else {
+                print!("- >");
+            }
         }
     }
 }
