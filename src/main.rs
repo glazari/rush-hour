@@ -11,4 +11,6 @@ fn main() {
 
     let game = game::Game::example_game();
     tui::draw((12, 10), &game);
+
+    tui::draw_win((21, 10), &game);
 }

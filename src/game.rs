@@ -141,7 +141,7 @@ impl Piece {
 
 #[derive(Debug)]
 pub struct Car {
-    piece: Piece,
+    pub piece: Piece,
     pub dir: Dir,
     pub position: (u8, u8),
 }
@@ -152,6 +152,14 @@ impl Car {
             piece,
             dir,
             position,
+        }
+    }
+
+    pub fn win_red() -> Car {
+        Car {
+            piece: Piece::Red,
+            dir: Dir::H,
+            position: (2, 7),
         }
     }
 

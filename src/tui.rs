@@ -5,8 +5,17 @@ pub fn clear() {
 }
 
 pub fn draw(base: (u8, u8), game: &Game) {
-    print!("\x1b[{};{}H", base.0, base.1); // move cursor to top
+    draw_base_board(base);
 
+    for car in game.cars.iter() {
+        draw_car(base, car);
+    }
+    print!("\x1b[{};{}H\n", base.0 + 7, base.1 + 15); // move cursor to bottom
+    print!("\x1b[0m\n"); // reset
+}
+
+fn draw_base_board(base: (u8, u8)) {
+    print!("\x1b[{};{}H", base.0, base.1); // move cursor to top
     print!(" _____________ \x1b[1B\x1b[15D");
     print!("| o o o o o o |\x1b[1B\x1b[15D");
     print!("| o o o o o o |\x1b[1B\x1b[15D");
@@ -15,9 +24,16 @@ pub fn draw(base: (u8, u8), game: &Game) {
     print!("| o o o o o o |\x1b[1B\x1b[15D");
     print!("| o o o o o o |\x1b[1B\x1b[15D");
     print!(" _____________ \x1b[1B\x1b[15D");
+}
+
+pub fn draw_win(base: (u8, u8), game: &Game) {
+    draw_base_board(base);
 
     for car in game.cars.iter() {
-        draw_car(base, car);
+        match car.piece {
+            game::Piece::Red => draw_car(base, &Car::win_red()),
+            _ => draw_car(base, car),
+        }
     }
     print!("\x1b[{};{}H\n", base.0 + 7, base.1 + 15); // move cursor to bottom
     print!("\x1b[0m\n"); // reset
