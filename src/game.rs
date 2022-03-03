@@ -47,6 +47,39 @@ impl Game {
         }
         return false;
     }
+
+    fn possible_moves(&self) -> Vec<(usize, Move)> {
+        let mut out = vec![];
+        let mut occupied: HashSet<(u8, u8)> = HashSet::new();
+
+        // build up occupied set
+        // for car in self.cars.iter()
+        for car in self.cars.iter() {
+            occupied.insert(car.position);
+        }
+
+        for (i, car) in self.cars.iter().enumerate() {
+            let (row, col) = car.position;
+            match car.dir {
+                Dir::V => {
+                    // Tile to the right (of full car) needs to be free
+                    // tile to the Left (of full car) needs to be free
+                    if row != 0 && !occupied.contains(&(row - 1, col)) {
+                        out.push((i, Move::Up))
+                    }
+
+                    if row+car.size() != 5 && !occupied.contains(&(row - 1, col)) {
+                        out.push((i, Move::Up))
+                }
+                Dir::H => {
+                    // Tile to the top (of full car) needs to be free
+                    // tile to the bottom (of full car) needs to be free
+                }
+            }
+        }
+
+        out
+    }
 }
 
 // example games
@@ -90,10 +123,25 @@ impl Game {
     }
 }
 
+fn vec_compare(va: &Vec<(usize, Move)>, vb: &Vec<(usize, Move)>) -> bool {
+    (va.len() == vb.len()) &&  // zip stops at the shortest
+     va.iter()
+       .zip(vb)
+       .all(|(a,b)| a == b)
+}
+
 #[derive(Debug)]
 pub enum Dir {
     V, //vertical
     H, //horizontal
+}
+
+#[derive(Debug, PartialEq)]
+pub enum Move {
+    Left,
+    Right,
+    Up,
+    Down,
 }
 
 #[derive(Debug, PartialEq, Eq, Hash, Clone, Copy)]
@@ -196,6 +244,7 @@ pub enum Color {
 enum Error {
     DuplicatePiece,
     OutOfBounds,
+    PieceOverlap,
 }
 
 #[cfg(test)]
@@ -224,6 +273,28 @@ mod test {
     }
 
     #[test]
+    #[ignore]
+    fn game_invalid_piece_overlap() {
+        // horizontal rigth overlap
+        let game = Game {
+            cars: vec![
+                Car::new(H, (0, 0), Piece::Bege),
+                Car::new(H, (0, 1), Piece::Green),
+            ],
+        };
+
+        assert_eq!(game.invalid().unwrap(), Error::PieceOverlap);
+
+        // horizontal rigth overlap truck
+        // horizontal left overlap
+        // horizontal left overlap truck
+        // vertical down overlap
+        // vertical down overlap truck
+        // vertical up overlap
+        // vertical up overlap truck
+    }
+
+    #[test]
     fn game_invalid_out_of_bounds() {
         // invalid cars
         let invalid_cars = vec![
@@ -246,5 +317,17 @@ mod test {
         };
 
         assert_eq!(game.invalid().unwrap(), Error::OutOfBounds);
+    }
+
+    #[test]
+    fn possible_moves_horizontal() {
+        let game = Game {
+            cars: vec![Car::new(H, (1, 0), Piece::Bege)],
+        };
+
+        let expected: Vec<(usize, Move)> = vec![(0, Move::Left), (0, Move::Right)];
+        let got = game.possible_moves();
+
+        assert!(vec_compare(&got, &expected));
     }
 }
