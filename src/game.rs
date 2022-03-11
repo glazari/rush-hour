@@ -4,8 +4,8 @@ pub struct Game {
     pub cars: Vec<Car>,
 }
 
-const V: Dir = Dir::V;
-const H: Dir = Dir::H;
+pub const V: Dir = Dir::V;
+pub const H: Dir = Dir::H;
 
 impl Game {
     fn invalid(&self) -> Option<Error> {
@@ -99,10 +99,18 @@ impl Game {
 
         out
     }
+
+    pub fn apply_move(&mut self, i: usize, m: Move) {
+        let car = self.cars[i];
+        self.cars[i] = car.moved(m);
+    }
 }
 
 // example games
 impl Game {
+    pub fn new(cars: Vec<Car>) -> Game {
+        Game { cars }
+    }
     pub fn full_grid() -> Game {
         Game {
             cars: vec![
@@ -142,13 +150,13 @@ impl Game {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Copy, Clone)]
 pub enum Dir {
     V, //vertical
     H, //horizontal
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone, Copy)]
 pub enum Move {
     Left,
     Right,
@@ -199,7 +207,7 @@ impl Piece {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Copy, Clone)]
 pub struct Car {
     pub piece: Piece,
     pub dir: Dir,
@@ -223,6 +231,22 @@ impl Car {
         }
     }
 
+    fn moved(&self, m: Move) -> Car {
+        let (row, col) = self.position;
+
+        let pos = match m {
+            Move::Up => (row - 1, col),
+            Move::Down => (row + 1, col),
+            Move::Left => (row, col - 1),
+            Move::Right => (row, col + 1),
+        };
+
+        Car {
+            piece: self.piece,
+            dir: self.dir,
+            position: pos,
+        }
+    }
     pub fn color(&self) -> Color {
         self.piece.color_size().0
     }
@@ -263,7 +287,7 @@ enum Error {
 mod test {
     use super::*;
 
-    fn vec_compare(va: &Vec<(usize, Move)>, vb: &Vec<(usize, Move)>) -> bool {
+    fn vec_compare<T: PartialEq>(va: &Vec<T>, vb: &Vec<T>) -> bool {
         (va.len() == vb.len()) &&  // zip stops at the shortest
      va.iter()
        .zip(vb)
@@ -372,5 +396,57 @@ mod test {
             println!("got:       {:?}", got);
             assert!(false);
         }
+    }
+
+    #[test]
+    fn move_car() {
+        let before = vec![
+            Car::new(H, (0, 1), Piece::Bege),
+            Car::new(H, (1, 1), Piece::Green),
+            Car::new(V, (3, 1), Piece::Red),
+            Car::new(V, (3, 2), Piece::Grey),
+        ];
+        let after = vec![
+            Car::new(H, (0, 2), Piece::Bege),
+            Car::new(H, (1, 0), Piece::Green),
+            Car::new(V, (4, 1), Piece::Red),
+            Car::new(V, (2, 2), Piece::Grey),
+        ];
+
+        let mut game = Game { cars: before };
+        game.apply_move(0, Move::Right);
+        game.apply_move(1, Move::Left);
+        game.apply_move(2, Move::Down);
+        game.apply_move(3, Move::Up);
+
+        let got = game.cars;
+
+        if !vec_compare(&got, &after) {
+            println!("expected:  {:?}", after);
+            println!("got:       {:?}", got);
+            assert!(false);
+        }
+    }
+
+    #[test]
+    fn solve_game() {
+        let _solvable = vec![
+            Car::new(V, (3, 1), Piece::Red),
+            Car::new(V, (3, 2), Piece::Grey),
+        ];
+
+        //let mut game = Game { cars: solvable };
+        //game.apply_move(0, Move::Right);
+        //game.apply_move(1, Move::Left);
+        //game.apply_move(2, Move::Down);
+        //game.apply_move(3, Move::Up);
+
+        //let got = game.cars;
+
+        //if !vec_compare(&got, &after) {
+        //    println!("expected:  {:?}", after);
+        //    println!("got:       {:?}", got);
+        //    assert!(false);
+        //}
     }
 }

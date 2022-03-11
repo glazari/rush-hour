@@ -1,4 +1,5 @@
-use crate::game::{self, Car, Dir, Game};
+use crate::game::{self, Car, Dir, Game, Move};
+use std::io::stdin;
 
 pub fn clear() {
     print!("\x1b[2J"); // clear screen
@@ -97,6 +98,24 @@ impl Color {
     }
 }
 
+pub fn animate_game(mut game: Game, moves: Vec<(usize, Move)>) {
+    let origin = (3, 10);
+    clear();
+
+    draw(origin, &game);
+    pause();
+    for (i, m) in moves.iter() {
+        game.apply_move(*i, *m);
+        draw(origin, &game);
+        pause();
+    }
+    draw_win(origin, &game);
+}
+
+fn pause() {
+    let mut s = String::new();
+    stdin().read_line(&mut s).expect("Use press enter");
+}
 /*
  * ANSI codes
  *
