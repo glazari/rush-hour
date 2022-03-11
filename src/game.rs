@@ -55,26 +55,44 @@ impl Game {
         // build up occupied set
         // for car in self.cars.iter()
         for car in self.cars.iter() {
-            occupied.insert(car.position);
+            let (row, col) = car.position;
+            for i in 0..car.size() {
+                match car.dir {
+                    Dir::V => occupied.insert((row + i, col)),
+                    Dir::H => occupied.insert((row, col + i)),
+                };
+            }
         }
+
+        //println!("occupied:\n{:?}", occupied);
 
         for (i, car) in self.cars.iter().enumerate() {
             let (row, col) = car.position;
+            //println!("{}: {:?}", i, car);
             match car.dir {
                 Dir::V => {
-                    // Tile to the right (of full car) needs to be free
-                    // tile to the Left (of full car) needs to be free
+                    // Tile to the top (of full car) needs to be free
                     if row != 0 && !occupied.contains(&(row - 1, col)) {
                         out.push((i, Move::Up))
                     }
 
-                    if row + car.size() != 5 && !occupied.contains(&(row - 1, col)) {
-                        out.push((i, Move::Up))
+                    // tile to the bottom (of full car) needs to be free
+                    let bottom_tile = row + car.size() - 1;
+                    if bottom_tile != 5 && !occupied.contains(&(bottom_tile + 1, col)) {
+                        out.push((i, Move::Down))
                     }
                 }
                 Dir::H => {
-                    // Tile to the top (of full car) needs to be free
-                    // tile to the bottom (of full car) needs to be free
+                    // tile to the Left (of full car) needs to be free
+                    if col != 0 && !occupied.contains(&(row, col - 1)) {
+                        out.push((i, Move::Left));
+                    }
+
+                    // Tile to the right (of full car) needs to be free
+                    let right_side = col + car.size() - 1;
+                    if right_side != 5 && !occupied.contains(&(row, right_side + 1)) {
+                        out.push((i, Move::Right));
+                    }
                 }
             }
         }
@@ -122,13 +140,6 @@ impl Game {
             ],
         }
     }
-}
-
-fn vec_compare(va: &Vec<(usize, Move)>, vb: &Vec<(usize, Move)>) -> bool {
-    (va.len() == vb.len()) &&  // zip stops at the shortest
-     va.iter()
-       .zip(vb)
-       .all(|(a,b)| a == b)
 }
 
 #[derive(Debug)]
@@ -252,6 +263,13 @@ enum Error {
 mod test {
     use super::*;
 
+    fn vec_compare(va: &Vec<(usize, Move)>, vb: &Vec<(usize, Move)>) -> bool {
+        (va.len() == vb.len()) &&  // zip stops at the shortest
+     va.iter()
+       .zip(vb)
+       .all(|(a,b)| a == b)
+    }
+
     #[test]
     fn game_valid() {
         let game = Game {
@@ -323,12 +341,36 @@ mod test {
     #[test]
     fn possible_moves_horizontal() {
         let game = Game {
-            cars: vec![Car::new(H, (1, 0), Piece::Bege)],
+            cars: vec![Car::new(H, (0, 1), Piece::Bege)],
         };
 
         let expected: Vec<(usize, Move)> = vec![(0, Move::Left), (0, Move::Right)];
         let got = game.possible_moves();
 
-        assert!(vec_compare(&got, &expected));
+        if !vec_compare(&got, &expected) {
+            println!("expected:  {:?}", expected);
+            println!("got:       {:?}", got);
+            assert!(false);
+        }
+    }
+
+    #[test]
+    fn possible_moves_truck_blocks_car() {
+        // vertival truck blocks horizontal car
+        let game = Game {
+            cars: vec![
+                Car::new(H, (3, 1), Piece::Bege),
+                Car::new(V, (1, 3), Piece::BlueTruck),
+            ],
+        };
+
+        let expected: Vec<(usize, Move)> = vec![(0, Move::Left), (1, Move::Up), (1, Move::Down)];
+        let got = game.possible_moves();
+
+        if !vec_compare(&got, &expected) {
+            println!("expected:  {:?}", expected);
+            println!("got:       {:?}", got);
+            assert!(false);
+        }
     }
 }
