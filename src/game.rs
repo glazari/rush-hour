@@ -1,5 +1,6 @@
 use std::collections::HashSet;
 
+#[derive(Debug)]
 pub struct Game {
     pub cars: Vec<Car>,
 }
@@ -8,6 +9,54 @@ pub const V: Dir = Dir::V;
 pub const H: Dir = Dir::H;
 
 impl Game {
+    fn is_finnished(&self) -> bool {
+        for car in self.cars.iter() {
+            if car.piece == Piece::Red && car.position == (2, 4) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    fn solve(&mut self) -> Option<Vec<(usize, Move)>> {
+        if self.is_finnished() {
+            return Some(vec![]);
+        }
+        println!("game {:?}", self.cars);
+
+        let possible_moves = self.possible_moves();
+        println!("possible_moves {:?}", possible_moves);
+
+        return None;
+        for (i, m) in possible_moves.iter() {
+            self.apply_move(*i, *m);
+            let out = self.solve();
+            match out {
+                Some(mut moves) => {
+                    moves.push((*i, *m));
+                    return Some(moves);
+                }
+                None => self.reverse_move(*i, *m),
+            }
+        }
+        None
+    }
+
+    fn reverse_move(&mut self, i: usize, m: Move) {
+        let m = match m {
+            Move::Right => Move::Left,
+            Move::Left => Move::Right,
+            Move::Up => Move::Down,
+            Move::Down => Move::Up,
+        };
+        self.apply_move(i, m);
+    }
+    fn pause() {
+        use std::io::stdin;
+        let mut s = String::new();
+        stdin().read_line(&mut s).expect("Use press enter");
+    }
+
     fn invalid(&self) -> Option<Error> {
         // check duplicates
         let mut set: HashSet<Piece> = HashSet::new();
@@ -430,23 +479,21 @@ mod test {
 
     #[test]
     fn solve_game() {
-        let _solvable = vec![
-            Car::new(V, (3, 1), Piece::Red),
-            Car::new(V, (3, 2), Piece::Grey),
+        let solvable = vec![
+            Car::new(H, (2, 3), Piece::Red),
+            Car::new(V, (2, 5), Piece::Grey),
         ];
 
-        //let mut game = Game { cars: solvable };
-        //game.apply_move(0, Move::Right);
-        //game.apply_move(1, Move::Left);
-        //game.apply_move(2, Move::Down);
-        //game.apply_move(3, Move::Up);
+        let mut game = Game { cars: solvable };
 
-        //let got = game.cars;
+        let mut got = game.solve().expect("solution");
+        got.reverse();
+        let expected = vec![(1, Move::Down), (0, Move::Right)];
 
-        //if !vec_compare(&got, &after) {
-        //    println!("expected:  {:?}", after);
-        //    println!("got:       {:?}", got);
-        //    assert!(false);
-        //}
+        if !vec_compare(&got, &expected) {
+            println!("expected:  {:?}", expected);
+            println!("got:       {:?}", got);
+            assert!(false);
+        }
     }
 }
