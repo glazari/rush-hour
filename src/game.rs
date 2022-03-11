@@ -68,8 +68,9 @@ impl Game {
                         out.push((i, Move::Up))
                     }
 
-                    if row+car.size() != 5 && !occupied.contains(&(row - 1, col)) {
+                    if row + car.size() != 5 && !occupied.contains(&(row - 1, col)) {
                         out.push((i, Move::Up))
+                    }
                 }
                 Dir::H => {
                     // Tile to the top (of full car) needs to be free
