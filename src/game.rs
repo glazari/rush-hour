@@ -1,6 +1,6 @@
-use std::collections::HashSet;
+use std::collections::{HashSet, VecDeque};
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Game {
     pub cars: Vec<Car>,
 }
@@ -18,30 +18,50 @@ impl Game {
         return false;
     }
 
-    fn solve(&mut self) -> Option<Vec<(usize, Move)>> {
-        if self.is_finnished() {
-            return Some(vec![]);
+    pub fn to_string(&self) -> String {
+        let mut s = String::new();
+
+        for car in self.cars.iter() {
+            s.push_str(&car.to_string());
+            s.push_str(",");
         }
-        println!("game {:?}", self.cars);
+        return s;
+    }
 
-        let possible_moves = self.possible_moves();
-        println!("possible_moves {:?}", possible_moves);
+    pub fn solve(&self) -> Option<Vec<(usize, Move)>> {
+        self._solve_bfs()
+    }
 
-        return None;
-        for (i, m) in possible_moves.iter() {
-            self.apply_move(*i, *m);
-            let out = self.solve();
-            match out {
-                Some(mut moves) => {
-                    moves.push((*i, *m));
-                    return Some(moves);
+    fn _solve_bfs(&self) -> Option<Vec<(usize, Move)>> {
+        let mut queue: VecDeque<(Game, Vec<(usize, Move)>)> =
+            VecDeque::from([(self.clone(), vec![])]);
+        let mut seen = HashSet::new();
+
+        while queue.len() > 0 {
+            let (game, moves) = queue.pop_front().expect("not empty");
+
+            if game.is_finnished() {
+                return Some(moves);
+            }
+
+            for (i, m) in game.possible_moves().iter() {
+                let mut next_game = game.clone();
+                let mut next_moves = moves.clone();
+                next_game.apply_move(*i, *m);
+                let gamestr = next_game.to_string();
+                if seen.contains(&gamestr) {
+                    continue;
                 }
-                None => self.reverse_move(*i, *m),
+                seen.insert(gamestr);
+                next_moves.push((*i, *m));
+                queue.push_back((next_game, next_moves));
             }
         }
+
         None
     }
 
+    #[allow(dead_code)]
     fn reverse_move(&mut self, i: usize, m: Move) {
         let m = match m {
             Move::Right => Move::Left,
@@ -205,6 +225,23 @@ pub enum Dir {
     H, //horizontal
 }
 
+impl Dir {
+    fn to_string(&self) -> String {
+        match self {
+            Dir::V => "V".to_string(),
+            Dir::H => "H".to_string(),
+        }
+    }
+
+    fn from_string(s: &str) -> Dir {
+        match s {
+            "V" => Dir::V,
+            "H" => Dir::H,
+            _ => panic!("unkown direction"),
+        }
+    }
+}
+
 #[derive(Debug, PartialEq, Clone, Copy)]
 pub enum Move {
     Left,
@@ -252,6 +289,47 @@ impl Piece {
             Piece::Red => (Color::RedMain, 2),
             Piece::Pink => (Color::Pink, 2),
             Piece::Purple => (Color::Purple, 2),
+        }
+    }
+    pub fn to_string(&self) -> String {
+        match self {
+            Piece::Bege => "H".to_string(),
+            Piece::Brown => "J".to_string(),
+            Piece::PukeGreen => "K".to_string(),
+            Piece::BlueTruck => "Q".to_string(),
+            Piece::PurpleTruck => "P".to_string(),
+            Piece::GreenTruck => "R".to_string(),
+            Piece::YellowTruck => "O".to_string(),
+            Piece::Yellow => "I".to_string(),
+            Piece::Green => "F".to_string(),
+            Piece::Grey => "G".to_string(),
+            Piece::SeaBlue => "A".to_string(),
+            Piece::Orange => "B".to_string(),
+            Piece::Cyan => "C".to_string(),
+            Piece::Red => "X".to_string(),
+            Piece::Pink => "D".to_string(),
+            Piece::Purple => "E".to_string(),
+        }
+    }
+    pub fn from_string(s: String) -> Piece {
+        match s.as_str() {
+            "H" => Piece::Bege,
+            "J" => Piece::Brown,
+            "K" => Piece::PukeGreen,
+            "Q" => Piece::BlueTruck,
+            "P" => Piece::PurpleTruck,
+            "R" => Piece::GreenTruck,
+            "O" => Piece::YellowTruck,
+            "I" => Piece::Yellow,
+            "F" => Piece::Green,
+            "G" => Piece::Grey,
+            "A" => Piece::SeaBlue,
+            "B" => Piece::Orange,
+            "C" => Piece::Cyan,
+            "X" => Piece::Red,
+            "D" => Piece::Pink,
+            "E" => Piece::Purple,
+            _ => panic!("unknown string"),
         }
     }
 }
@@ -303,6 +381,15 @@ impl Car {
     pub fn size(&self) -> u8 {
         self.piece.color_size().1
     }
+
+    pub fn to_string(&self) -> String {
+        format!(
+            "{} {} {:?}",
+            self.piece.to_string(),
+            self.dir.to_string(),
+            self.position,
+        )
+    }
 }
 
 #[derive(Clone, Copy, Debug)]
@@ -341,6 +428,15 @@ mod test {
      va.iter()
        .zip(vb)
        .all(|(a,b)| a == b)
+    }
+
+    #[test]
+    fn dir_to_string() {
+        let d = Dir::H;
+        assert_eq!(d, Dir::from_string(&d.to_string()));
+
+        let d = Dir::V;
+        assert_eq!(d, Dir::from_string(&d.to_string()));
     }
 
     #[test]
@@ -484,11 +580,33 @@ mod test {
             Car::new(V, (2, 5), Piece::Grey),
         ];
 
-        let mut game = Game { cars: solvable };
+        let game = Game { cars: solvable };
 
-        let mut got = game.solve().expect("solution");
-        got.reverse();
+        let got = game.solve().expect("solution");
         let expected = vec![(1, Move::Down), (0, Move::Right)];
+
+        if !vec_compare(&got, &expected) {
+            println!("expected:  {:?}", expected);
+            println!("got:       {:?}", got);
+            assert!(false);
+        }
+    }
+
+    #[test]
+    fn solve_example_game() {
+        let game = Game::example_game();
+
+        let got = game.solve().expect("solution");
+        let expected = vec![
+            (3, Move::Up),
+            (5, Move::Left),
+            (5, Move::Left),
+            (6, Move::Down),
+            (6, Move::Down),
+            (2, Move::Right),
+            (2, Move::Right),
+            (2, Move::Right),
+        ];
 
         if !vec_compare(&got, &expected) {
             println!("expected:  {:?}", expected);

@@ -14,11 +14,12 @@ fn main() {
 
     tui::draw_win((21, 10), &game);
 
-    let game = game::Game::new(vec![
-        Car::new(H, (2, 3), Piece::Red),
-        Car::new(V, (2, 5), Piece::Yellow),
-    ]);
+    let game = game::Game::example_game();
+    let moves = game.solve().expect("solution");
+    tui::clear();
+    tui::draw((21, 10), &game);
 
-    let moves = vec![(1, Move::Down), (0, Move::Right)];
-    tui::animate_game(game, moves);
+    tui::animate_game(game.clone(), moves.clone());
+    println!("{:?}", moves);
+    println!("{}", game.to_string());
 }
