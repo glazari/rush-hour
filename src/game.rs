@@ -220,6 +220,26 @@ impl Game {
             ],
         }
     }
+
+    pub fn hard_example_game() -> Game {
+        Game {
+            cars: vec![
+                Car::new(V, (0, 0), Piece::YellowTruck),
+                Car::new(H, (0, 1), Piece::Green),
+                Car::new(V, (1, 1), Piece::Cyan),
+                Car::new(V, (1, 2), Piece::Pink),
+                Car::new(H, (3, 0), Piece::PurpleTruck),
+                Car::new(H, (5, 0), Piece::Bege),
+                Car::new(V, (4, 2), Piece::PukeGreen),
+                Car::new(H, (2, 3), Piece::Red),
+                Car::new(V, (3, 3), Piece::Purple),
+                Car::new(H, (5, 3), Piece::Yellow),
+                Car::new(V, (0, 4), Piece::Orange),
+                Car::new(H, (4, 4), Piece::Grey),
+                Car::new(V, (1, 5), Piece::PurpleTruck),
+            ],
+        }
+    }
 }
 
 #[derive(Debug, PartialEq, Copy, Clone)]
@@ -609,6 +629,102 @@ mod test {
             (2, Move::Right),
             (2, Move::Right),
             (2, Move::Right),
+        ];
+
+        if !vec_compare(&got, &expected) {
+            println!("expected:  {:?}", expected);
+            println!("got:       {:?}", got);
+            assert!(false);
+        }
+    }
+
+    #[test]
+    fn solve_hard_example_game() {
+        let game = Game::hard_example_game();
+
+        let got = game.solve().expect("solution");
+        let expected = vec![
+            (9, Move::Right),
+            (8, Move::Down),
+            (4, Move::Right),
+            (0, Move::Down),
+            (0, Move::Down),
+            (1, Move::Left),
+            (3, Move::Up),
+            (4, Move::Right),
+            (2, Move::Down),
+            (2, Move::Down),
+            (7, Move::Left),
+            (7, Move::Left),
+            (10, Move::Down),
+            (12, Move::Up),
+            (4, Move::Right),
+            (6, Move::Up),
+            (5, Move::Right),
+            (0, Move::Down),
+            (7, Move::Left),
+            (3, Move::Down),
+            (1, Move::Right),
+            (1, Move::Right),
+            (1, Move::Right),
+            (3, Move::Up),
+            (7, Move::Right),
+            (0, Move::Up),
+            (0, Move::Up),
+            (0, Move::Up),
+            (5, Move::Left),
+            (6, Move::Down),
+            (4, Move::Left),
+            (7, Move::Right),
+            (2, Move::Up),
+            (2, Move::Up),
+            (2, Move::Up),
+            (4, Move::Left),
+            (4, Move::Left),
+            (7, Move::Left),
+            (8, Move::Up),
+            (8, Move::Up),
+            (8, Move::Up),
+            (4, Move::Right),
+            (0, Move::Down),
+            (0, Move::Down),
+            (4, Move::Right),
+            (9, Move::Left),
+            (11, Move::Left),
+            (12, Move::Down),
+            (1, Move::Right),
+            (8, Move::Up),
+            (7, Move::Right),
+            (2, Move::Down),
+            (2, Move::Down),
+            (2, Move::Down),
+            (7, Move::Left),
+            (8, Move::Down),
+            (1, Move::Left),
+            (12, Move::Up),
+            (4, Move::Right),
+            (6, Move::Up),
+            (5, Move::Right),
+            (0, Move::Down),
+            (7, Move::Left),
+            (3, Move::Down),
+            (1, Move::Left),
+            (1, Move::Left),
+            (1, Move::Left),
+            (3, Move::Up),
+            (7, Move::Right),
+            (0, Move::Up),
+            (5, Move::Left),
+            (6, Move::Down),
+            (4, Move::Left),
+            (8, Move::Up),
+            (7, Move::Right),
+            (10, Move::Up),
+            (7, Move::Right),
+            (12, Move::Down),
+            (12, Move::Down),
+            (12, Move::Down),
+            (7, Move::Right),
         ];
 
         if !vec_compare(&got, &expected) {

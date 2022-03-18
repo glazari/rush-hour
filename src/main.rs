@@ -12,12 +12,11 @@ fn main() {
 
     tui::draw_win((21, 10), &game);
 
-    let game = game::Game::example_game();
+    let game = game::Game::hard_example_game();
     let moves = game.solve().expect("solution");
     tui::clear();
     tui::draw((21, 10), &game);
 
     tui::animate_game(game.clone(), moves.clone());
-    println!("{:?}", moves);
-    println!("{}", game.to_string());
+    println!("\n\n");
 }
