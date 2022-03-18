@@ -442,6 +442,25 @@ enum Error {
     PieceOverlap,
 }
 
+fn position_to_string(p: (u8, u8)) -> String {
+    format!("({}:{})", p.0, p.1)
+}
+
+fn position_from_string(s: &str) -> (u8, u8) {
+    let patterns: &[_] = &['(', ')'];
+    let nums: Result<Vec<u8>, _> = s
+        .trim_matches(patterns)
+        .split(':')
+        .map(|c: &str| c.parse())
+        .collect();
+    let nums = nums.expect("perfectly parsable");
+
+    if nums.len() < 2 {
+        panic!("position needs 2 values");
+    }
+    (nums[0], nums[1])
+}
+
 #[cfg(test)]
 mod test {
     use super::*;
@@ -451,6 +470,14 @@ mod test {
      va.iter()
        .zip(vb)
        .all(|(a,b)| a == b)
+    }
+
+    #[test]
+    fn position_to_string_test() {
+        let p: (u8, u8) = (2, 3);
+
+        assert_eq!("(2:3)", position_to_string(p));
+        assert_eq!(p, position_from_string(&position_to_string(p)));
     }
 
     #[test]
