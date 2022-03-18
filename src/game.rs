@@ -334,8 +334,8 @@ impl Piece {
             Piece::Purple => "E".to_string(),
         }
     }
-    pub fn from_string(s: String) -> Piece {
-        match s.as_str() {
+    pub fn from_string(s: &str) -> Piece {
+        match s {
             "H" => Piece::Bege,
             "J" => Piece::Brown,
             "K" => Piece::PukeGreen,
@@ -407,11 +407,25 @@ impl Car {
 
     pub fn to_string(&self) -> String {
         format!(
-            "{} {} {:?}",
+            "{} {} {}",
             self.piece.to_string(),
             self.dir.to_string(),
-            self.position,
+            position_to_string(self.position),
         )
+    }
+
+    pub fn from_string(s: &str) -> Car {
+        let parts: Vec<&str> = s.split(' ').collect();
+
+        if parts.len() < 3 {
+            panic!("car needs 3 parts");
+        }
+
+        Car {
+            piece: Piece::from_string(parts[0]),
+            dir: Dir::from_string(parts[1]),
+            position: position_from_string(parts[2]),
+        }
     }
 }
 
@@ -470,6 +484,14 @@ mod test {
      va.iter()
        .zip(vb)
        .all(|(a,b)| a == b)
+    }
+
+    #[test]
+    fn car_to_string_test() {
+        let c = Car::new(Dir::H, (3, 4), Piece::Red);
+
+        assert_eq!("X H (3:4)", c.to_string());
+        assert_eq!(c, Car::from_string(&c.to_string()));
     }
 
     #[test]
