@@ -1,8 +1,6 @@
 mod game;
 mod tui;
 
-use game::{Car, Move, Piece, H, V};
-
 fn main() {
     tui::clear();
 

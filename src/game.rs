@@ -71,12 +71,15 @@ impl Game {
         };
         self.apply_move(i, m);
     }
+
+    #[allow(dead_code)]
     fn pause() {
         use std::io::stdin;
         let mut s = String::new();
         stdin().read_line(&mut s).expect("Use press enter");
     }
 
+    #[allow(dead_code)]
     fn invalid(&self) -> Option<Error> {
         // check duplicates
         let mut set: HashSet<Piece> = HashSet::new();
