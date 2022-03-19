@@ -1,6 +1,6 @@
 use std::collections::{HashSet, VecDeque};
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct Game {
     pub cars: Vec<Car>,
 }
@@ -19,13 +19,25 @@ impl Game {
     }
 
     pub fn to_string(&self) -> String {
-        let mut s = String::new();
+        let mut sv: Vec<String> = vec![];
 
         for car in self.cars.iter() {
-            s.push_str(&car.to_string());
-            s.push_str(",");
+            sv.push(car.to_string());
         }
-        return s;
+
+        return sv.join(",");
+    }
+
+    pub fn from_string(s: &str) -> Game {
+        let cars_str: Vec<&str> = s.split(',').collect();
+
+        let mut cars_vec: Vec<Car> = vec![];
+
+        for car_str in cars_str {
+            cars_vec.push(Car::from_string(car_str));
+        }
+
+        Game::new(cars_vec)
     }
 
     pub fn solve(&self) -> Option<Vec<(usize, Move)>> {
@@ -484,6 +496,17 @@ mod test {
      va.iter()
        .zip(vb)
        .all(|(a,b)| a == b)
+    }
+
+    #[test]
+    fn game_to_string_test() {
+        let g = Game::new(vec![
+            Car::new(Dir::H, (3, 4), Piece::Red),
+            Car::new(Dir::V, (4, 4), Piece::Bege),
+        ]);
+
+        assert_eq!("X H (3:4),H V (4:4)", g.to_string());
+        assert_eq!(g, Game::from_string(&g.to_string()));
     }
 
     #[test]
