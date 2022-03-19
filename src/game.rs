@@ -1,4 +1,5 @@
 use std::collections::{HashSet, VecDeque};
+use std::fs;
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct Game {
@@ -38,6 +39,14 @@ impl Game {
         }
 
         Game::new(cars_vec)
+    }
+
+    pub fn from_file(filename: &str) -> Game {
+        let contents = fs::read_to_string(filename).expect("no problem reading file");
+
+        let line = contents.split('\n').collect::<Vec<&str>>()[0];
+
+        Game::from_string(line)
     }
 
     pub fn solve(&self) -> Option<Vec<(usize, Move)>> {
@@ -507,6 +516,15 @@ mod test {
 
         assert_eq!("X H (3:4),H V (4:4)", g.to_string());
         assert_eq!(g, Game::from_string(&g.to_string()));
+    }
+
+    #[test]
+    fn game_from_file() {
+        let g = Game::from_string(
+            "F H (0:0),P V (1:0),B V (4:0),X H (2:1),Q V (1:3),R H (5:2),C H (4:4),O V (0:5)",
+        );
+
+        assert_eq!(g, Game::from_file("games/level1.txt"));
     }
 
     #[test]
