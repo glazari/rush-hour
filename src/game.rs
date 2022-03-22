@@ -294,6 +294,64 @@ pub enum Move {
     Down,
 }
 
+impl Move {
+    fn to_string(&self) -> String {
+        match self {
+            Move::Left => "left".to_string(),
+            Move::Right => "right".to_string(),
+            Move::Up => "up".to_string(),
+            Move::Down => "down".to_string(),
+        }
+    }
+
+    fn from_string(s: &str) -> Move {
+        match s {
+            "left" => Move::Left,
+            "right" => Move::Right,
+            "up" => Move::Up,
+            "down" => Move::Down,
+            _ => panic!("unknown Move"),
+        }
+    }
+}
+
+fn move_to_string(m: (u8, Move)) -> String {
+    format!("{} {}", m.0, m.1.to_string())
+}
+
+fn move_from_string(s: &str) -> (u8, Move) {
+    let parts: Vec<&str> = s.split(' ').collect();
+
+    if parts.len() < 2 {
+        panic!("need 2 parts to form move");
+    }
+
+    let car: u8 = parts[0].parse().expect("parse car index");
+    let m = Move::from_string(parts[1]);
+    (car, m)
+}
+
+fn moves_to_string(moves: &Vec<(u8, Move)>) -> String {
+    let mut sv: Vec<String> = vec![];
+
+    for &m in moves.iter() {
+        sv.push(move_to_string(m));
+    }
+
+    return sv.join(",");
+}
+fn moves_from_string(s: &str) -> Vec<(u8, Move)> {
+    let moves_str: Vec<&str> = s.split(',').collect();
+
+    let mut moves_vec: Vec<(u8, Move)> = vec![];
+
+    for move_str in moves_str {
+        moves_vec.push(move_from_string(move_str));
+    }
+
+    moves_vec
+}
+
 #[derive(Debug, PartialEq, Eq, Hash, Clone, Copy)]
 pub enum Piece {
     Bege,
@@ -550,6 +608,23 @@ mod test {
 
         let d = Dir::V;
         assert_eq!(d, Dir::from_string(&d.to_string()));
+    }
+
+    #[test]
+    fn test_move_to_string() {
+        let m = Move::Left;
+        assert_eq!("left", &m.to_string());
+
+        assert_eq!(m, Move::from_string(&m.to_string()));
+
+        let move_tup: (u8, Move) = (3, m);
+
+        assert_eq!("3 left", move_to_string(move_tup));
+        assert_eq!(move_tup, move_from_string(&move_to_string(move_tup)));
+
+        let moves: Vec<(u8, Move)> = vec![(1, Move::Left), (0, Move::Up)];
+        assert_eq!("1 left,0 up", moves_to_string(&moves));
+        assert_eq!(moves, moves_from_string(&moves_to_string(&moves)));
     }
 
     #[test]
