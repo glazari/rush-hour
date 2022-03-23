@@ -9,6 +9,10 @@ Classic rush hour game to free the read car from the parking lot.
 
 # TODO
 
-- [x] write solution to file
-- [ ] check and save all 40 solutions in files
-- [ ] add test that goes through all 40 games
+- [ ] [Feature] Update main to let you choose a game and render the solution
+- [ ] [Doc] Update Readme with explanation and gif of main work-flow
+- [ ] [Refactor] remove color indirection 
+- [ ] [Refactor] unify Move and direction
+- [ ] [Refactor] make a "Move" abstraction that describes both direction and car
+
+
