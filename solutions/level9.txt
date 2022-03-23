@@ -1,0 +1,1 @@
+0 right,2 up,2 up,2 up,5 left,4 down,4 down,0 right,1 down,3 left,7 left,8 left,9 down,0 right,10 up,10 up,0 right

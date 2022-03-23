@@ -315,23 +315,23 @@ impl Move {
     }
 }
 
-fn move_to_string(m: (u8, Move)) -> String {
+fn move_to_string(m: (usize, Move)) -> String {
     format!("{} {}", m.0, m.1.to_string())
 }
 
-fn move_from_string(s: &str) -> (u8, Move) {
+fn move_from_string(s: &str) -> (usize, Move) {
     let parts: Vec<&str> = s.split(' ').collect();
 
     if parts.len() < 2 {
         panic!("need 2 parts to form move");
     }
 
-    let car: u8 = parts[0].parse().expect("parse car index");
+    let car: usize = parts[0].parse().expect("parse car index");
     let m = Move::from_string(parts[1]);
     (car, m)
 }
 
-fn moves_to_string(moves: &Vec<(u8, Move)>) -> String {
+pub fn moves_to_string(moves: &Vec<(usize, Move)>) -> String {
     let mut sv: Vec<String> = vec![];
 
     for &m in moves.iter() {
@@ -340,16 +340,21 @@ fn moves_to_string(moves: &Vec<(u8, Move)>) -> String {
 
     return sv.join(",");
 }
-fn moves_from_string(s: &str) -> Vec<(u8, Move)> {
+fn moves_from_string(s: &str) -> Vec<(usize, Move)> {
     let moves_str: Vec<&str> = s.split(',').collect();
 
-    let mut moves_vec: Vec<(u8, Move)> = vec![];
+    let mut moves_vec: Vec<(usize, Move)> = vec![];
 
     for move_str in moves_str {
         moves_vec.push(move_from_string(move_str));
     }
 
     moves_vec
+}
+
+fn moves_to_file(moves: &Vec<(usize, Move)>) {
+    let moves_string = moves_to_string(moves);
+    fs::write("foo.txt", moves_string).expect("write moves to file");
 }
 
 #[derive(Debug, PartialEq, Eq, Hash, Clone, Copy)]
@@ -617,12 +622,12 @@ mod test {
 
         assert_eq!(m, Move::from_string(&m.to_string()));
 
-        let move_tup: (u8, Move) = (3, m);
+        let move_tup: (usize, Move) = (3, m);
 
         assert_eq!("3 left", move_to_string(move_tup));
         assert_eq!(move_tup, move_from_string(&move_to_string(move_tup)));
 
-        let moves: Vec<(u8, Move)> = vec![(1, Move::Left), (0, Move::Up)];
+        let moves: Vec<(usize, Move)> = vec![(1, Move::Left), (0, Move::Up)];
         assert_eq!("1 left,0 up", moves_to_string(&moves));
         assert_eq!(moves, moves_from_string(&moves_to_string(&moves)));
     }
